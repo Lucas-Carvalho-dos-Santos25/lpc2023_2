@@ -1,0 +1,53 @@
+import random
+
+# Função para gerar uma sequência aleatória de 28 caracteres
+def gerar_frase_inicial():
+    return ''.join(random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ ') for _ in range(28))
+
+# Função para realizar a mutação em uma cópia da frase
+def realizar_mutacao(frase, taxa_mutacao):
+    nova_frase = ''
+    for char in frase:
+        if random.uniform(0, 1) < taxa_mutacao:
+            nova_frase += random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ ')
+        else:
+            nova_frase += char
+    return nova_frase
+
+# Função para calcular a pontuação de uma frase em relação à frase alvo
+def calcular_pontuacao(frase, frase_alvo):
+    return sum(1 for a, b in zip(frase, frase_alvo) if a == b)
+
+# Função principal do programa "Doninha"
+def doninha():
+    frase_alvo = "METHINKS IT IS LIKE A WEASEL"
+    taxa_mutacao = 0.05
+    num_copias = 100
+
+    # Inicializa a primeira geração de frases
+    geracao_atual = [gerar_frase_inicial() for _ in range(num_copias)]
+
+    geracoes = 0
+    while True:
+        # Avalia a pontuação de cada cópia da geração atual
+        pontuacoes = [calcular_pontuacao(frase, frase_alvo) for frase in geracao_atual]
+
+        # Verifica se alguma cópia atingiu a pontuação perfeita
+        if 28 in pontuacoes:
+            indice = pontuacoes.index(28)
+            print("Encontrada frase perfeita:", geracao_atual[indice])
+            break
+
+        # Seleciona a cópia com a maior pontuação para a próxima geração
+        melhor_indice = pontuacoes.index(max(pontuacoes))
+        proxima_geracao = [realizar_mutacao(geracao_atual[melhor_indice], taxa_mutacao) for _ in range(num_copias)]
+
+        geracao_atual = proxima_geracao
+        geracoes += 1
+
+        # Imprime informações a cada 10 gerações
+        if geracoes % 10 == 0:
+            print(f"Geração {geracoes}: Melhor pontuação = {max(pontuacoes)}")
+
+if __name__ == "__main__":
+    doninha()
